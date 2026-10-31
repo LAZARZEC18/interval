@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en-AU" data-app="interval">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Interval — workout and rest timer</title>
+<meta name="description" content="A workout timer for Tabata, EMOM, HIIT, boxing rounds and your own circuits, with a big readable ring, sound and voice cues, and a history of every session.">
+<meta property="og:title" content="Interval">
+<meta property="og:description" content="A workout timer for Tabata, EMOM, HIIT, boxing rounds and your own circuits, with sound and voice cues and a history of every session.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lz-interval.pages.dev/">
+<meta property="og:image" content="https://lz-interval.pages.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="zl.css">
+<link rel="stylesheet" href="styles.css">
+<script src="zl.js"></script>
+<script src="engine.js" defer></script>
+<script src="cues.js" defer></script>
+<script src="history.js" defer></script>
+<script src="builder.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body id="top">
+<div data-zl="nav"></div>
+
+<main>
+  <section class="zl-hero zl-wrap">
+    <div data-zl="icon"></div>
+    <h1>Interval</h1>
+    <p class="zl-tagline">A workout timer you can read from across the room.</p>
+    <p class="zl-sub">Tabata, EMOM, boxing rounds or a circuit you build yourself. A big ring, clear beeps and voice cues, and a record of every session you train.</p>
+    <div class="zl-hero-ctas">
+      <a class="zl-btn zl-btn-primary zl-btn-lg" href="#app">Start a workout</a>
+      <a class="zl-btn zl-btn-secondary zl-btn-lg" href="#how">See how it works</a>
+    </div>
+    <div class="zl-hero-meta">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Free, no sign-up</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Saved on your device</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Works offline</span>
+    </div>
+  </section>
+
+  <section class="zl-stage" id="app" data-nav="Timer">
+    <div class="zl-wrap">
+      <div class="zl-app iv-app">
+        <div class="zl-appbar">
+          <div class="zl-appbar-title"><span class="zl-dot iv-dot" id="iv-dot" data-status="idle"></span><span class="iv-title-name" id="iv-title">Tabata</span> <span class="zl-appbar-status" id="iv-status">Ready</span></div>
+          <span class="iv-wake" id="iv-wake" data-state="idle" data-tip="Wake lock keeps your screen on while the timer runs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3"/></svg><span id="iv-wake-text">Screen on while running</span></span>
+          <button class="zl-btn zl-btn-secondary zl-btn-sm" type="button" id="iv-settings-btn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Sound</span></button>
+          <button class="zl-btn zl-btn-secondary zl-btn-sm" type="button" id="iv-keys-btn" aria-haspopup="dialog" aria-label="Keyboard shortcuts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M8 14h8"/></svg><span class="iv-hide-sm">Shortcuts</span></button>
+        </div>
+
+        <div class="iv-tabs">
+          <div class="zl-seg" role="tablist" aria-label="Interval sections" id="iv-tabs">
+            <button role="tab" type="button" id="tab-timer" aria-controls="view-timer" aria-selected="true" data-view="timer">Timer</button>
+            <button role="tab" type="button" id="tab-presets" aria-controls="view-presets" aria-selected="false" data-view="presets" tabindex="-1">Presets</button>
+            <button role="tab" type="button" id="tab-builder" aria-controls="view-builder" aria-selected="false" data-view="builder" tabindex="-1">Builder</button>
+            <button role="tab" type="button" id="tab-history" aria-controls="view-history" aria-selected="false" data-view="history" tabindex="-1">History</button>
+          </div>
+        </div>
+
+        <!-- TIMER -->
+        <div class="iv-view iv-timer-view" id="view-timer" role="tabpanel" aria-labelledby="tab-timer">
+          <div class="iv-timer" id="iv-timer" data-type="work" data-status="idle">
+            <div class="iv-focus-bar">
+              <span class="iv-focus-name" id="iv-focus-name">Tabata</span>
+              <button class="zl-btn zl-btn-secondary zl-btn-sm" type="button" id="iv-exit-focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>Exit focus</button>
+            </div>
+            <div class="iv-ring-wrap" id="iv-ring">
+              <svg class="iv-ring-svg" viewBox="0 0 440 440" aria-hidden="true">
+                <circle class="iv-sess-track" cx="220" cy="220" r="211"/>
+                <circle class="iv-sess-bar" id="iv-sess-bar" cx="220" cy="220" r="211" pathLength="1000"/>
+                <circle class="iv-track" cx="220" cy="220" r="186"/>
+                <circle class="iv-bar" id="iv-bar" cx="220" cy="220" r="186" pathLength="1000"/>
+              </svg>
+              <div class="iv-ring-center">
+                <span class="iv-phase" id="iv-phase"><span class="iv-phase-dot"></span><span id="iv-phase-name">Work</span></span>
+                <span class="iv-time num" id="iv-time" role="timer" aria-label="Time left in this phase">0:20</span>
+                <span class="iv-round" id="iv-round">Round 1 of 8</span>
+                <span class="iv-next" id="iv-next"><span class="iv-next-label">Up next</span> <b id="iv-next-name">Rest</b> <span class="num" id="iv-next-time">0:10</span></span>
+              </div>
+            </div>
+
+            <div class="iv-timeline-wrap" id="iv-timeline-wrap">
+              <div class="iv-timeline" id="iv-timeline" role="group" aria-label="Session timeline. Select a block to jump to it."></div>
+              <div class="iv-timeline-meta num"><span id="iv-elapsed">0:00</span><span id="iv-tl-label" class="iv-tl-label">8 rounds</span><span id="iv-total">4:00</span></div>
+            </div>
+
+            <div class="iv-controls" id="iv-controls">
+              <button class="iv-ctl" type="button" id="iv-reset" aria-keyshortcuts="R"><span class="iv-ctl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5v4.2h4.2"/></svg></span><span class="iv-ctl-label">Reset</span></button>
+              <button class="iv-ctl" type="button" id="iv-back" aria-keyshortcuts="B"><span class="iv-ctl-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5.5h2.4v13H6zM19 6.2v11.6a.8.8 0 0 1-1.2.7L9.6 12.7a.8.8 0 0 1 0-1.4l8.2-5.8a.8.8 0 0 1 1.2.7z"/></svg></span><span class="iv-ctl-label">Back</span></button>
+              <button class="iv-ctl iv-ctl-main" type="button" id="iv-start" aria-keyshortcuts="Space"><span class="iv-ctl-btn"><svg class="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.6v12.8a1 1 0 0 0 1.5.86l10.4-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z"/></svg><svg class="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg></span><span class="iv-ctl-label" id="iv-start-label">Start</span></button>
+              <button class="iv-ctl" type="button" id="iv-skip" aria-keyshortcuts="N"><span class="iv-ctl-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.6 5.5H18v13h-2.4zM5 6.2v11.6a.8.8 0 0 0 1.2.7l8.2-5.8a.8.8 0 0 0 0-1.4L6.2 5.5A.8.8 0 0 0 5 6.2z"/></svg></span><span class="iv-ctl-label">Skip</span></button>
+              <button class="iv-ctl" type="button" id="iv-plus"><span class="iv-ctl-btn iv-ctl-text num">+15</span><span class="iv-ctl-label">Add 15 s</span></button>
+            </div>
+            <button class="iv-focus-toggle zl-btn zl-btn-ghost zl-btn-sm" type="button" id="iv-focus-btn" aria-keyshortcuts="F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Focus mode</button>
+            <p class="sr-only" id="iv-announce" aria-live="assertive"></p>
+          </div>
+
+          <aside class="iv-side" aria-label="Session details">
+            <div class="iv-card iv-session" id="iv-session">
+              <div class="iv-card-head">
+                <div><span class="iv-eyebrow">Now loaded</span><h2 id="iv-sess-name">Tabata</h2></div>
+                <button class="zl-btn zl-btn-ghost zl-btn-sm" type="button" id="iv-edit-current">Edit</button>
+              </div>
+              <div class="iv-sess-stats">
+                <div class="zl-stat"><b class="num" id="iv-st-elapsed">0:00</b><span>Elapsed</span></div>
+                <div class="zl-stat"><b class="num" id="iv-st-left">4:00</b><span>Left</span></div>
+                <div class="zl-stat"><b class="num" id="iv-st-blocks">0/16</b><span>Blocks done</span></div>
+              </div>
+              <h3 class="iv-mini-h">Coming up</h3>
+              <ol class="iv-upnext" id="iv-upnext" aria-live="off"></ol>
+            </div>
+            <div class="iv-card iv-quickrest" id="iv-quickrest">
+              <div class="iv-card-head"><div><h2>Rest timer</h2><p class="zl-hint">Tap a time between sets. It starts straight away.</p></div></div>
+              <div class="iv-rest-btns" data-rest-group>
+                <button class="iv-rest-btn" type="button" data-rest="60"><b class="num">1:00</b><span>60 s</span></button>
+                <button class="iv-rest-btn" type="button" data-rest="90"><b class="num">1:30</b><span>90 s</span></button>
+                <button class="iv-rest-btn" type="button" data-rest="120"><b class="num">2:00</b><span>120 s</span></button>
+                <button class="iv-rest-btn" type="button" data-rest="180"><b class="num">3:00</b><span>180 s</span></button>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <!-- PRESETS -->
+        <div class="iv-view" id="view-presets" role="tabpanel" aria-labelledby="tab-presets" hidden>
+          <div class="iv-view-head">
+            <div><h2>Presets</h2><p>Proven formats, ready to go. Start one now or copy it into the builder to make it yours.</p></div>
+          </div>
+          <div class="iv-preset-grid" id="iv-preset-grid">
+            <article class="iv-preset iv-preset-rest">
+              <div class="iv-preset-top"><span class="iv-swatch" data-type="rest"></span><h3>Rest timer</h3></div>
+              <p>Between sets. Tap a length and it starts at once, no countdown.</p>
+              <div class="iv-rest-btns" data-rest-group>
+                <button class="iv-rest-btn" type="button" data-rest="60"><b class="num">1:00</b><span>60 s</span></button>
+                <button class="iv-rest-btn" type="button" data-rest="90"><b class="num">1:30</b><span>90 s</span></button>
+                <button class="iv-rest-btn" type="button" data-rest="120"><b class="num">2:00</b><span>120 s</span></button>
+                <button class="iv-rest-btn" type="button" data-rest="180"><b class="num">3:00</b><span>180 s</span></button>
+              </div>
+            </article>
+          </div>
+          <div class="iv-view-head iv-view-head-sub">
+            <div><h2>Your workouts</h2><p id="iv-saved-count">Workouts you save in the builder appear here.</p></div>
+            <button class="zl-btn zl-btn-secondary zl-btn-sm" type="button" id="iv-new-workout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New workout</button>
+          </div>
+          <div class="iv-saved" id="iv-saved"></div>
+        </div>
+
+        <!-- BUILDER -->
+        <div class="iv-view" id="view-builder" role="tabpanel" aria-labelledby="tab-builder" hidden>
+          <div class="iv-builder">
+            <div class="iv-builder-main">
+              <div class="zl-field iv-name-field">
+                <label class="zl-label" for="iv-b-name">Workout name</label>
+                <input class="zl-input" id="iv-b-name" maxlength="40" placeholder="Leg day finisher" autocomplete="off">
+                <span class="zl-error" id="iv-b-name-err" hidden></span>
+              </div>
+              <div class="iv-b-listhead">
+                <h3>Blocks</h3>
+                <span class="zl-hint">Drag the handle to reorder, or use the arrows. Durations are minutes:seconds.</span>
+              </div>
+              <ol class="iv-blocks" id="iv-blocks" aria-label="Workout blocks"></ol>
+              <div class="zl-empty iv-blocks-empty" id="iv-blocks-empty" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M10 2.5h4"/></svg>
+                <h3>No blocks yet</h3><p>Add a work block to start. Then add rest and repeat them as a group.</p>
+              </div>
+              <div class="iv-add-row" role="group" aria-label="Add a block">
+                <button class="zl-chip" type="button" data-add="work"><span class="iv-swatch" data-type="work"></span>Add work</button>
+                <button class="zl-chip" type="button" data-add="rest"><span class="iv-swatch" data-type="rest"></span>Add rest</button>
+                <button class="zl-chip" type="button" data-add="prep"><span class="iv-swatch" data-type="prep"></span>Add prep</button>
+                <button class="zl-chip" type="button" data-add="cooldown"><span class="iv-swatch" data-type="cooldown"></span>Add cool-down</button>
+              </div>
+            </div>
+            <div class="iv-builder-side">
+              <div class="iv-card iv-total-card">
+                <span class="iv-eyebrow" id="iv-b-editing">New workout</span>
+                <div class="iv-total num" id="iv-b-total" aria-live="polite">0:00</div>
+                <div class="iv-total-sub" id="iv-b-sub">0 intervals</div>
+                <div class="iv-total-bar" id="iv-b-bar" aria-hidden="true"></div>
+              </div>
+              <div class="iv-card iv-group-card" id="iv-group-card">
+                <label class="zl-switch"><input type="checkbox" id="iv-g-on"> Repeat a group of blocks</label>
+                <div class="iv-group-fields" id="iv-group-fields">
+                  <div class="iv-g-row">
+                    <div class="zl-field"><label class="zl-label" for="iv-g-from">From block</label><select class="zl-select" id="iv-g-from"></select></div>
+                    <div class="zl-field"><label class="zl-label" for="iv-g-to">To block</label><select class="zl-select" id="iv-g-to"></select></div>
+                  </div>
+                  <div class="zl-field">
+                    <span class="zl-label" id="iv-g-times-l">Times</span>
+                    <div class="iv-stepper" role="group" aria-labelledby="iv-g-times-l">
+                      <button type="button" class="iv-step-btn" id="iv-g-minus" aria-label="One fewer time">&minus;</button>
+                      <input class="zl-input num" id="iv-g-times" inputmode="numeric" aria-labelledby="iv-g-times-l" value="8">
+                      <button type="button" class="iv-step-btn" id="iv-g-plus" aria-label="One more time">+</button>
+                    </div>
+                  </div>
+                  <label class="zl-switch"><input type="checkbox" id="iv-g-skip" checked> Skip the final rest</label>
+                  <span class="zl-hint" id="iv-g-hint">The marked blocks play in order, then repeat.</span>
+                </div>
+              </div>
+              <div class="iv-b-actions">
+                <button class="zl-btn zl-btn-primary" type="button" id="iv-b-save">Save workout</button>
+                <button class="zl-btn zl-btn-secondary" type="button" id="iv-b-start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.6v12.8a1 1 0 0 0 1.5.86l10.4-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z"/></svg>Start now</button>
+                <button class="zl-btn zl-btn-ghost" type="button" id="iv-b-saveas" hidden>Save as new</button>
+                <button class="zl-btn zl-btn-ghost" type="button" id="iv-b-clear">Start over</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="iv-view" id="view-history" role="tabpanel" aria-labelledby="tab-history" hidden>
+          <div class="iv-hist-stats" id="iv-hist-stats">
+            <div class="iv-card iv-streak"><div class="iv-streak-num num" id="iv-h-streak">0</div><div><b>Day streak</b><span id="iv-h-best">Best 0 days</span></div></div>
+            <div class="iv-card zl-stat"><b class="num" id="iv-h-week">0 min</b><span>This week</span></div>
+            <div class="iv-card zl-stat"><b class="num" id="iv-h-count">0</b><span>Sessions</span></div>
+            <div class="iv-card zl-stat"><b class="num" id="iv-h-rate">0%</b><span>Finished</span></div>
+          </div>
+          <div class="iv-card iv-chart-card" id="iv-chart-card">
+            <div class="iv-card-head">
+              <div><h2>Minutes trained</h2><p class="zl-hint" id="iv-chart-sub">Last 7 days</p></div>
+              <div class="zl-seg" id="iv-chart-seg" aria-label="Chart range">
+                <button type="button" aria-pressed="true" data-range="days">Days</button>
+                <button type="button" aria-pressed="false" data-range="weeks">Weeks</button>
+              </div>
+            </div>
+            <div class="iv-chart" id="iv-chart"></div>
+          </div>
+          <div class="iv-card iv-log-card">
+            <div class="iv-card-head">
+              <div><h2>Sessions</h2><p class="zl-hint">Every finished or stopped session, newest first.</p></div>
+              <button class="zl-btn zl-btn-danger zl-btn-sm" type="button" id="iv-h-clear">Clear history</button>
+            </div>
+            <ul class="iv-log" id="iv-log"></ul>
+            <div class="zl-empty" id="iv-log-empty" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+              <h3>No sessions yet</h3><p>Finish or stop a workout and it is saved here with its time and date.</p>
+              <div class="iv-empty-actions"><button class="zl-btn zl-btn-primary" type="button" data-goto="timer">Go to timer</button><button class="zl-btn zl-btn-secondary" type="button" id="iv-h-example">Load example history</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="iv-kbd-hint">Press <kbd>Space</kbd> to start or pause, <kbd>F</kbd> for focus mode and <kbd>?</kbd> for every shortcut.</p>
+    </div>
+  </section>
+
+  <section class="zl-section alt" id="how" data-nav="How it works">
+    <div class="zl-wrap">
+      <div class="zl-section-head zl-reveal"><h2>Pick it. Start it. Train.</h2><p>No set-up screens. The ring tells you what to do and for how long.</p></div>
+      <div class="zl-steps zl-reveal">
+        <div class="zl-step"><h3>Choose a workout</h3><p>Start a preset like Tabata or boxing rounds, or build your own circuit with a repeat group.</p></div>
+        <div class="zl-step"><h3>Press start</h3><p>A 3-2-1 countdown, then the ring takes over. Space pauses, N skips, F goes full screen.</p></div>
+        <div class="zl-step"><h3>Follow the cues</h3><p>Beeps, voice and colour tell you when to switch. Every session lands in your history.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="zl-section" id="features" data-nav="Features">
+    <div class="zl-wrap">
+      <div class="zl-section-head zl-reveal"><h2>Everything a gym timer should do.</h2><p>Built for sweaty hands, phones propped on a bench and screens across the room.</p></div>
+      <div class="zl-bento zl-reveal">
+        <div class="zl-tile wide iv-tile-focus">
+          <h3>Readable from across the room.</h3>
+          <p>Focus mode goes full screen with digits sized to the display, and the ring changes colour with every phase.</p>
+          <div class="zl-tile-visual iv-fv">
+            <svg viewBox="0 0 520 170" role="img" aria-label="Focus mode showing 0:17 of work">
+              <rect x="0" y="0" width="520" height="170" rx="18" class="iv-fv-bg"/>
+              <circle cx="96" cy="85" r="58" class="iv-fv-track"/>
+              <circle cx="96" cy="85" r="58" class="iv-fv-work" pathLength="100" stroke-dasharray="72 100" transform="rotate(-90 96 85)"/>
+              <text x="96" y="96" text-anchor="middle" class="iv-fv-num">0:17</text>
+              <text x="190" y="62" class="iv-fv-label">Work</text>
+              <text x="190" y="118" class="iv-fv-big">Round 5 of 8</text>
+              <g transform="translate(190 136)">
+                <rect width="36" height="8" rx="4" class="iv-fv-w"/><rect x="40" width="18" height="8" rx="4" class="iv-fv-r"/>
+                <rect x="62" width="36" height="8" rx="4" class="iv-fv-w"/><rect x="102" width="18" height="8" rx="4" class="iv-fv-r"/>
+                <rect x="124" width="36" height="8" rx="4" class="iv-fv-w"/><rect x="164" width="18" height="8" rx="4" class="iv-fv-r"/>
+                <rect x="186" width="36" height="8" rx="4" class="iv-fv-w"/><rect x="226" width="18" height="8" rx="4" class="iv-fv-r"/>
+                <rect x="248" width="36" height="8" rx="4" class="iv-fv-w iv-fv-dim"/><rect x="288" width="18" height="8" rx="4" class="iv-fv-r iv-fv-dim"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="zl-tile">
+          <div class="zl-tile-big">0.0 s</div>
+          <h3>No drift.</h3>
+          <p>Time is worked out from the system clock, not a counting loop, so a two-hour session still ends on the second.</p>
+          <div class="zl-tile-visual iv-drift" aria-label="Planned 2:00:00, timed 2:00:00" role="img">
+            <div><span>Planned</span><i><b></b></i><span>2:00:00</span></div>
+            <div><span>Timed</span><i><b></b></i><span>2:00:00</span></div>
+          </div>
+        </div>
+        <div class="zl-tile">
+          <h3>Cues you can hear and feel.</h3>
+          <p>Distinct tones for work, rest and done, a voice that calls the phase, and a buzz on phones that support it.</p>
+          <div class="zl-tile-visual">
+            <svg viewBox="0 0 240 64" class="iv-wave" role="img" aria-label="Three short beeps then a long tone">
+              <g class="iv-wave-tick"><rect x="8" y="22" width="10" height="20" rx="5"/><rect x="48" y="22" width="10" height="20" rx="5"/><rect x="88" y="22" width="10" height="20" rx="5"/></g>
+              <g class="iv-wave-go"><rect x="128" y="10" width="10" height="44" rx="5"/><rect x="144" y="4" width="10" height="56" rx="5"/><rect x="160" y="12" width="10" height="40" rx="5"/><rect x="176" y="20" width="10" height="24" rx="5"/><rect x="192" y="26" width="10" height="12" rx="5"/></g>
+              <text x="13" y="62" text-anchor="middle">3</text><text x="53" y="62" text-anchor="middle">2</text><text x="93" y="62" text-anchor="middle">1</text>
+            </svg>
+          </div>
+        </div>
+        <div class="zl-tile">
+          <h3>Repeat groups.</h3>
+          <p>Mark a run of blocks and repeat it. Skip the last rest so you finish on work.</p>
+          <div class="zl-tile-visual iv-rg">
+            <span class="iv-rg-b" data-type="prep">Prep</span>
+            <span class="iv-rg-group"><span class="iv-rg-b" data-type="work">Work</span><span class="iv-rg-b" data-type="rest">Rest</span><b>&times;8</b></span>
+          </div>
+        </div>
+        <div class="zl-tile">
+          <h3>Keyboard first.</h3>
+          <p>Run a whole class from a laptop without touching the mouse.</p>
+          <div class="zl-tile-visual iv-keys">
+            <kbd class="iv-key-wide">Space</kbd><kbd>R</kbd><kbd>N</kbd><kbd>B</kbd><kbd>F</kbd>
+          </div>
+        </div>
+        <div class="zl-tile wide iv-tile-hist">
+          <div class="iv-th-text">
+            <h3>Every session, remembered.</h3>
+            <p>Finished and stopped sessions are saved with their date and time. See your minutes by day or week and keep your streak going.</p>
+          </div>
+          <div class="zl-tile-visual iv-th-vis">
+            <svg viewBox="0 0 300 120" role="img" aria-label="Bar chart of minutes trained each day this week">
+              <line x1="0" y1="100" x2="300" y2="100" class="iv-th-base"/>
+              <rect x="6" y="58" width="28" height="42" rx="6"/><rect x="48" y="34" width="28" height="66" rx="6"/><rect x="90" y="70" width="28" height="30" rx="6"/>
+              <rect x="132" y="96" width="28" height="4" rx="2" class="iv-th-zero"/><rect x="174" y="22" width="28" height="78" rx="6"/><rect x="216" y="46" width="28" height="54" rx="6"/><rect x="258" y="12" width="28" height="88" rx="6" class="iv-th-today"/>
+              <text x="20" y="116">M</text><text x="62" y="116">T</text><text x="104" y="116">W</text><text x="146" y="116">T</text><text x="188" y="116">F</text><text x="230" y="116">S</text><text x="272" y="116">S</text>
+            </svg>
+          </div>
+        </div>
+        <div class="zl-tile">
+          <div class="zl-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3"/><path d="M12 7.5v4l2 1.5"/></svg></div>
+          <h3>Your screen stays on.</h3>
+          <p>While a timer runs, Interval asks the browser to keep the display awake, and shows you whether it worked.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="zl-section alt" id="faq" data-nav="FAQ">
+    <div class="zl-wrap">
+      <div class="zl-section-head center zl-reveal"><h2>Questions</h2></div>
+      <div class="zl-faq zl-reveal">
+        <details><summary>Does the timer keep going if I switch apps or lock my phone?</summary><div>Yes. Interval works out the time from timestamps rather than counting ticks, so when you come back it jumps to exactly the right phase. While it runs it also asks the browser to keep your screen on. Some phones pause web audio while the screen is locked, so leave Interval open for beeps.</div></details>
+        <details><summary>Why can't I hear the beeps?</summary><div>Browsers only allow sound after you tap something on the page, so the first press of Start unlocks it. On an iPhone, check the silent switch. Open Sound in the app bar and press Test sound to check your volume.</div></details>
+        <details><summary>How do repeat groups work?</summary><div>In the builder, turn on Repeat a group and choose the first and last block to repeat, then how many times. Blocks before the group play once at the start and blocks after it play once at the end, which is handy for a warm-up and cool-down.</div></details>
+        <details><summary>What do Back and Skip do?</summary><div>Skip jumps to the next block. Back restarts the current block, or goes to the previous one if you press it in the first two seconds. You can also select any block in the timeline under the ring to jump straight to it.</div></details>
+        <details><summary>Where are my workouts and history stored?</summary><div>In your browser's storage on this device. Nothing is uploaded and there is no account. Clearing your browser data removes them.</div></details>
+        <details><summary>Does it work offline?</summary><div>Yes. Once the page has loaded, the timer, cues, builder and history all work without a connection.</div></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div data-zl="footer"></div>
+
+<dialog class="zl-dialog iv-settings" id="iv-settings" aria-labelledby="iv-settings-h">
+  <form method="dialog">
+    <div class="zl-dialog-head"><h2 id="iv-settings-h">Sound and cues</h2><button class="zl-iconbtn" value="close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="zl-dialog-body">
+      <div class="iv-set-group">
+        <label class="zl-switch"><input type="checkbox" id="s-sound"> Beeps</label>
+        <span class="zl-hint">Ticks at 3, 2, 1 and a different tone for work, rest and done.</span>
+        <div class="zl-field">
+          <label class="zl-label" for="s-volume">Volume <span class="num" id="s-volume-val">70%</span></label>
+          <div class="iv-vol-row"><input type="range" id="s-volume" min="0" max="100" step="5" class="iv-range"><button class="zl-btn zl-btn-secondary zl-btn-sm" type="button" id="s-test">Test sound</button></div>
+        </div>
+      </div>
+      <div class="iv-set-group">
+        <label class="zl-switch"><input type="checkbox" id="s-voice"> Voice cues</label>
+        <span class="zl-hint" id="s-voice-hint">Says each phase as it starts, plus "Halfway" and "Done".</span>
+        <label class="zl-switch"><input type="checkbox" id="s-half"> Say "Halfway" at the midpoint</label>
+        <button class="zl-btn zl-btn-secondary zl-btn-sm iv-self-start" type="button" id="s-test-voice">Test voice</button>
+      </div>
+      <div class="iv-set-group">
+        <label class="zl-switch"><input type="checkbox" id="s-vibrate"> Vibrate on phase change</label>
+        <span class="zl-hint" id="s-vibrate-hint">Works on most Android phones. iPhones don't allow it in the browser.</span>
+        <label class="zl-switch"><input type="checkbox" id="s-lead"> 3-2-1 countdown before starting</label>
+        <label class="zl-switch"><input type="checkbox" id="s-wake"> Keep the screen on while running</label>
+      </div>
+    </div>
+    <div class="zl-dialog-foot"><button class="zl-btn zl-btn-primary" value="close">Done</button></div>
+  </form>
+</dialog>
+
+<dialog class="zl-dialog iv-keys-dlg" id="iv-keys" aria-labelledby="iv-keys-h">
+  <form method="dialog">
+    <div class="zl-dialog-head"><h2 id="iv-keys-h">Keyboard shortcuts</h2><button class="zl-iconbtn" value="close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="zl-dialog-body">
+      <dl class="iv-shortcuts">
+        <div><dt><kbd>Space</kbd></dt><dd>Start or pause</dd></div>
+        <div><dt><kbd>N</kbd></dt><dd>Skip to the next block</dd></div>
+        <div><dt><kbd>B</kbd></dt><dd>Back to the start of this block, or the previous one</dd></div>
+        <div><dt><kbd>R</kbd></dt><dd>Reset the session</dd></div>
+        <div><dt><kbd>F</kbd></dt><dd>Focus mode, full screen</dd></div>
+        <div><dt><kbd>?</kbd></dt><dd>Show this list</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Leave focus mode or close a dialog</dd></div>
+      </dl>
+      <p class="zl-hint">Shortcuts work anywhere on the page except while you are typing in a field.</p>
+    </div>
+    <div class="zl-dialog-foot"><button class="zl-btn zl-btn-primary" value="close">Got it</button></div>
+  </form>
+</dialog>
+</body>
+</html>
